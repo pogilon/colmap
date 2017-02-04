@@ -254,7 +254,7 @@ void FindBestMatches(const Eigen::MatrixXi& dists, const float max_ratio,
     matches->reserve(std::min(num_matches12, num_matches21));
     for (size_t i1 = 0; i1 < matches12.size(); ++i1) {
       if (matches12[i1] != -1 && matches21[matches12[i1]] != -1 &&
-          matches21[matches12[i1]] == i1) {
+          matches21[matches12[i1]] == static_cast<int>(i1)) {
         FeatureMatch match;
         match.point2D_idx1 = i1;
         match.point2D_idx2 = matches12[i1];
@@ -978,7 +978,6 @@ void SequentialFeatureMatcher::Options::Check() const {
   CHECK_GT(overlap, 0);
   CHECK_GT(loop_detection_period, 0);
   CHECK_GT(loop_detection_num_images, 0);
-  CHECK_GT(loop_detection_max_num_features, 0);
   if (loop_detection) {
     CHECK(boost::filesystem::exists(vocab_tree_path));
   }
@@ -1668,7 +1667,6 @@ void MatchGuidedSiftFeaturesCPU(const SiftMatchOptions& match_options,
       return ((H * p1).hnormalized() - p2).squaredNorm() > max_residual;
     };
   } else {
-    two_view_geometry->inlier_matches.clear();
     return;
   }
 
@@ -1798,7 +1796,6 @@ void MatchGuidedSiftFeaturesGPU(const SiftMatchOptions& match_options,
     H = two_view_geometry->H.cast<float>();
     H_ptr = H.data();
   } else {
-    two_view_geometry->inlier_matches.clear();
     return;
   }
 
